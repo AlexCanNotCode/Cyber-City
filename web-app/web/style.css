@@ -1,0 +1,36 @@
+/* Reset some basic styles */
+body, h1, div {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1f1f1f, #3b3b98);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+#wait-time {
+  font-size: 2rem;
+  padding: 1rem 2rem;
+  border: 2px solid #ffffff33;
+  border-radius: 10px;
+  background-color: #ffffff1a;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+#wait-time:hover {
+  background-color: #ffffff2b;
+}
