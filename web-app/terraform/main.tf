@@ -82,8 +82,8 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamo_policy" {
 # Lambda Zip Packaging
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}web-app/lambda/lambda_function.py"
-  output_path = "${path.module}web-app/lambda/lambda_function.zip"
+  source_file = "${path.module}/lambda/lambda_function.py"
+  output_path = "${path.module}/lambda/lambda_function.zip"
 }
 
 # Lambda Function
