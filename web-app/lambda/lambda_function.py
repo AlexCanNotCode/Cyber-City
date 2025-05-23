@@ -25,6 +25,11 @@ def lambda_handler(event, context):
                     )
         return {
             "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",  # or your domain
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+            },
             "body": json.dumps(recommendations or "All rides are fine!")
         }
     except Exception as e:
