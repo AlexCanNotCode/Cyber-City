@@ -1,0 +1,77 @@
+{
+  "rides": [
+    {
+      "id": 1,
+      "name": "Quantum Accelerator",
+      "status": "open",
+      "category": "thrill",
+      "type": "Hyper Coaster",
+      "imageUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200",
+      "capacity": "6 riders",
+      "lastUpdated": "2025-05-29T21:36:11.168696",
+      "waitTime": 18,
+      "nextShowTime": null
+    },
+    {
+      "id": 2,
+      "name": "Neon Circuit",
+      "status": "open",
+      "category": "family",
+      "type": "Light Ride",
+      "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200",
+      "capacity": "All ages",
+      "lastUpdated": "2025-05-29T21:36:11.168714",
+      "waitTime": 12,
+      "nextShowTime": null
+    },
+    {
+      "id": 3,
+      "name": "Matrix Drop Tower",
+      "status": "open",
+      "category": "thrill",
+      "type": "Virtual Drop",
+      "imageUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200",
+      "capacity": "12 riders",
+      "lastUpdated": "2025-05-29T21:36:11.168719",
+      "waitTime": 42,
+      "nextShowTime": null
+    },
+    {
+      "id": 4,
+      "name": "Holographic Theater",
+      "status": "open",
+      "category": "shows",
+      "type": "VR Experience",
+      "imageUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200",
+      "capacity": "200 guests",
+      "lastUpdated": "2025-05-29T21:36:11.168724",
+      "waitTime": null,
+      "nextShowTime": "3:15 PM"
+    },
+    {
+      "id": 5,
+      "name": "Cyber Splash Zone",
+      "status": "open",
+      "category": "family",
+      "type": "Digital Rapids",
+      "imageUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200",
+      "capacity": "8 riders",
+      "lastUpdated": "2025-05-29T21:36:11.168729",
+      "waitTime": 28,
+      "nextShowTime": null
+    },
+    {
+      "id": 6,
+      "name": "Neural Interface",
+      "status": "maintenance",
+      "category": "thrill",
+      "type": "Mind Coaster",
+      "imageUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200",
+      "capacity": "4 riders",
+      "lastUpdated": "2025-05-29T21:36:11.168734",
+      "waitTime": null,
+      "nextShowTime": null
+    }
+  ],
+  "lastUpdated": "2025-05-29T21:42:06.442661"
+}
