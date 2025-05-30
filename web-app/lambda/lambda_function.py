@@ -1,39 +1,93 @@
 import json
 import boto3
-
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('CyberCrowds')  # Make sure this matches your Terraform table
+from datetime import datetime
+import os
 
 def lambda_handler(event, context):
+    """
+    AWS Lambda function to fetch ride wait times from DynamoDB
+    and return them in the format expected by the display interface
+    """
+    
+    # Initialize DynamoDB client
+    dynamodb = boto3.client('dynamodb', region_name='us-east-1')
+    
+    table_name = 'CyberCrowds'
+    
     try:
-        response = table.scan()
-        items = response.get('Items', [])
-        if not items:
-            return {
-                "statusCode": 400,
-                "body": json.dumps("No ride wait times found.")
+        # Scan the table for all ride data
+        response = dynamodb.scan(
+            TableName=table_name,
+            FilterExpression='begins_with(GuestID, :ride_prefix)',
+            ExpressionAttributeValues={
+                ':ride_prefix': {'S': 'ride-'}
             }
-        # Simulate processing
-        ride_wait_times = {item['ride']: int(item['wait_time']) for item in items}
-        recommendations = []
-        for ride, wait_time in ride_wait_times.items():
-            if wait_time > 45:
-                less_busy_ride = min(ride_wait_times, key=ride_wait_times.get)
-                if ride != less_busy_ride:
-                    recommendations.append(
-                        f"{ride} = {wait_time} mins. Try {less_busy_ride} = {ride_wait_times[less_busy_ride]} mins."
-                    )
-        return {
-            "statusCode": 200,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",  # or your domain
-                "Access-Control-Allow-Headers": "Content-Type",
-                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-            },
-            "body": json.dumps(recommendations or "All rides are fine!")
+        )
+        
+        rides = []
+        for item in response['Items']:
+            # Convert DynamoDB item to the expected format
+            ride = {
+                'id': int(item.get('id', {}).get('N', '0')),
+                'name': item.get('name', {}).get('S', ''),
+                'status': item.get('status', {}).get('S', 'open'),
+                'category': item.get('category', {}).get('S', ''),
+                'type': item.get('type', {}).get('S', ''),
+                'imageUrl': item.get('imageUrl', {}).get('S'),
+                'capacity': item.get('capacity', {}).get('S'),
+                'lastUpdated': item.get('lastUpdated', {}).get('S', datetime.now().isoformat())
+            }
+            
+            # Handle waitTime (only for rides, not shows)
+            if 'waitTime' in item:
+                ride['waitTime'] = int(item['waitTime']['N']) if item['waitTime']['N'] != '0' or ride['status'] != 'maintenance' else None
+            else:
+                ride['waitTime'] = None
+            
+            # Handle nextShowTime (for shows)
+            if 'nextShowTime' in item:
+                ride['nextShowTime'] = item['nextShowTime']['S']
+            else:
+                ride['nextShowTime'] = None
+                
+            rides.append(ride)
+        
+        # Sort rides by ID for consistent ordering
+        rides.sort(key=lambda x: x['id'])
+        
+        if not rides:
+            return {
+                'statusCode': 400,
+                'body': json.dumps("No ride wait times found.")
+            }
+        
+        # Return the formatted response
+        response_data = {
+            'rides': rides,
+            'lastUpdated': datetime.now().isoformat()
         }
-    except Exception as e:
+        
         return {
-            "statusCode": 500,
-            "body": json.dumps(f"Error: {str(e)}")
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type'
+            },
+            'body': json.dumps(response_data)
+        }
+        
+    except Exception as e:
+        print(f"Error fetching ride data: {str(e)}")
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                'error': 'Internal server error',
+                'message': str(e)
+            })
         }
