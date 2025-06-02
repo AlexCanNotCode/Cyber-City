@@ -144,16 +144,10 @@ resource "aws_dynamodb_table" "cybercrowds" {
   read_capacity  = 5
   write_capacity = 5
   hash_key       = "GuestID"
-  range_key      = "Timestamp"
 
   attribute {
     name = "GuestID"
     type = "S"
-  }
-
-  attribute {
-    name = "Timestamp"
-    type = "N"
   }
 }
 
