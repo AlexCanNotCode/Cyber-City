@@ -1,13 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Wait Times</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Lambda API Example</title>
 </head>
 <body>
   <h1>Ride Wait Time</h1>
-  <div id="wait-time">Loading...</div>
+  <div id="output">Loading...</div>
 
-  <script src="script.js"></script>
+<script>
+  fetch('https:execute-api.us-eas1.amazonaws.com')
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById('output');
+      container.innerHTML = ''; // Clear old content
+
+      if (data.rides && data.rides.length > 0) {
+        data.rides.forEach(ride => {
+          const p = document.createElement('p');
+          p.textContent = `Ride: ${ride.ride}, Wait Time: ${ride.wait_time}`;
+          container.appendChild(p);
+        });
+      } else {
+        container.textContent = 'No ride data available.';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching API:', error);
+      document.getElementById('output').innerText = 'Error loading data.';
+    });
+</script>
+
 </body>
 </html>
