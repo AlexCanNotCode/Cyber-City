@@ -8,7 +8,7 @@
   <div id="output">Loading...</div>
 
 <script>
-  fetch('https:execute-api.us-eas1.amazonaws.com')
+  fetch('https://6f5a6nmp5h.execute-api.us-east-1.amazonaws.com/prod/wait') // Make sure your URL is correct!
     .then(response => response.json())
     .then(data => {
       const container = document.getElementById('output');
@@ -16,8 +16,19 @@
 
       if (data.rides && data.rides.length > 0) {
         data.rides.forEach(ride => {
+          const waitTime = parseInt(ride.wait_time); // Convert wait time to number
+          let status = '';
+
+          if (waitTime <= 15) {
+            status = 'Low';
+          } else if (waitTime <= 40) {
+            status = 'Medium';
+          } else {
+            status = 'Long';
+          }
+
           const p = document.createElement('p');
-          p.textContent = `Ride: ${ride.ride}, Wait Time: ${ride.wait_time}`;
+          p.textContent = `Ride: ${ride.ride}, Wait Time: ${ride.wait_time} mins, Status: ${status}`;
           container.appendChild(p);
         });
       } else {
@@ -29,6 +40,5 @@
       document.getElementById('output').innerText = 'Error loading data.';
     });
 </script>
-
 </body>
 </html>
