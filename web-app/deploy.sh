@@ -27,6 +27,7 @@ docker tag $REPO_NAME:latest $ECR_URL:$IMAGE_TAG
 docker push $ECR_URL:$IMAGE_TAG
 
 echo "Adding data to Dynamo DB"
+cd ..
 python3 import_data.py
 
 echo "Deployment complete. App should be live via ECS!"
