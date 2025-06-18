@@ -2,9 +2,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# -----------------------------
-# VPC + Networking Setup
-# -----------------------------
+# VPC Setup
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
 }
@@ -20,7 +18,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 }
 
-resource "aws_route_table" " "main" {
+resource "aws_route_table" "main" {
   vpc_id = aws_vpc.main.id
 
   route {
@@ -34,9 +32,7 @@ resource "aws_route_table_association" "main" {
   route_table_id = aws_route_table.main.id
 }
 
-# -----------------------------
-# Security Group for ECS
-# -----------------------------
+# Security Group
 resource "aws_security_group" "web_sg" {
   name        = "web-sg"
   description = "Allow HTTP access"
@@ -57,9 +53,7 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
-# -----------------------------
-# IAM for Lambda
-# -----------------------------
+# IAM Roles & Policies for Lambda
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda-exec-role"
 
@@ -75,25 +69,24 @@ resource "aws_iam_role" "lambda_exec_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_basic" {
+resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
   role       = aws_iam_role.lambda_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_dynamo" {
+resource "aws_iam_role_policy_attachment" "lambda_dynamo_policy" {
   role       = aws_iam_role.lambda_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
 }
 
-# -----------------------------
-# Lambda Deployment
-# -----------------------------
+# Lambda Zip Packaging
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_file = "${path.module}/../lambda/lambda_function.py"
   output_path = "${path.module}/../lambda/lambda_function.zip"
 }
 
+# Lambda Function
 resource "aws_lambda_function" "wait_time" {
   function_name    = "wait-time-lambda"
   role             = aws_iam_role.lambda_exec_role.arn
@@ -103,9 +96,7 @@ resource "aws_lambda_function" "wait_time" {
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip.output_path)
 }
 
-# -----------------------------
-# API Gateway (REST API)
-# -----------------------------
+# API Gateway
 resource "aws_api_gateway_rest_api" "api" {
   name = "WaitTimeAPI"
 }
@@ -143,17 +134,10 @@ resource "aws_lambda_permission" "api_gateway" {
 resource "aws_api_gateway_deployment" "deployment" {
   depends_on  = [aws_api_gateway_integration.lambda]
   rest_api_id = aws_api_gateway_rest_api.api.id
+  stage_name  = "prod"
 }
 
-resource "aws_api_gateway_stage" "prod" {
-  deployment_id = aws_api_gateway_deployment.deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  stage_name    = "prod"
-}
-
-# -----------------------------
 # DynamoDB Table
-# -----------------------------
 resource "aws_dynamodb_table" "cybercrowds" {
   name           = "CyberCrowds"
   billing_mode   = "PROVISIONED"
@@ -167,9 +151,7 @@ resource "aws_dynamodb_table" "cybercrowds" {
   }
 }
 
-# -----------------------------
-# ECS: ECR, Cluster, Task, Service
-# -----------------------------
+# ECS Setup
 resource "aws_ecr_repository" "waittime_web" {
   name = "waittime-web"
 }
@@ -207,12 +189,12 @@ resource "aws_ecs_task_definition" "web" {
   execution_role_arn       = aws_iam_role.ecs_task_exec_role.arn
 
   container_definitions = jsonencode([{
-    name      = "waittime-web",
-    image     = "${aws_ecr_repository.waittime_web.repository_url}:latest",
-    essential = true,
+    name      = "waittime-web"
+    image     = "${aws_ecr_repository.waittime_web.repository_url}:latest"
+    essential = true
     portMappings = [{
-      containerPort = 80,
-      hostPort      = 80,
+      containerPort = 80
+      hostPort      = 80
       protocol      = "tcp"
     }]
   }])
